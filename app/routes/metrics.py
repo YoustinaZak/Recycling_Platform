@@ -5,8 +5,6 @@ from prometheus_client import (
     generate_latest,
 )
 
-from app.metrics import queue_length
-
 metrics_bp = Blueprint("metrics", __name__)
 
 events_created = Counter(

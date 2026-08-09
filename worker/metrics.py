@@ -1,4 +1,3 @@
-from app.metrics import queue_length
 from prometheus_client import Counter
 
 events_processed = Counter(
