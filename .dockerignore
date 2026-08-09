@@ -1,0 +1,11 @@
+.git
+.gitignore
+.venv
+venv
+__pycache__
+*.pyc
+.env
+migrations/__pycache__
+.pytest_cache
+.coverage
+evidence
