@@ -14,10 +14,10 @@ def create_app():
 
     from app.routes.events import events_bp
     from app.routes.health import health_bp
-    from app.routes.dashboard import dashboard_bp
+    from app.routes.readiness import readiness_bp
 
     app.register_blueprint(events_bp)
     app.register_blueprint(health_bp)
-    app.register_blueprint(dashboard_bp)
+    app.register_blueprint(readiness_bp)
 
     return app
