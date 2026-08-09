@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Drop Me - Recycling Events</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: #f5f6f8;
+            color: #222;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f8f8;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .processed {
+            color: #16803c;
+        }
+
+        .received {
+            color: #b7791f;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Recycling Events</h1>
+
+    <div class="subtitle">
+        Drop Me operational event view
+    </div>
+
+    <div class="card">
+
+        {% if events %}
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Machine ID</th>
+                    <th>Material</th>
+                    <th>Item Count</th>
+                    <th>Status</th>
+                    <th>Event Time</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for event in events %}
+
+                <tr>
+                    <td>{{ event.machine_id }}</td>
+
+                    <td>{{ event.material_type }}</td>
+
+                    <td>{{ event.item_count }}</td>
+
+                    <td class="status {{ event.processing_status }}">
+                        {{ event.processing_status }}
+                    </td>
+
+                    <td>
+                        {{ event.event_timestamp }}
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% else %}
+
+        <div class="empty">
+            No recycling events recorded yet.
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+</body>
+</html>
