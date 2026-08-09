@@ -22,9 +22,7 @@ USER appuser
 
 FROM base AS api
 
-COPY docker/entrypoint.sh /entrypoint.sh
-
-RUN chmod +x /entrypoint.sh
+COPY --chmod=755 docker/entrypoint.sh /entrypoint.sh
 
 #just metadata
 EXPOSE 5000
