@@ -1,4 +1,5 @@
 import os
+
 #environment variables, docker can override them
 from dotenv import load_dotenv
 

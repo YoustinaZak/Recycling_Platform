@@ -13,11 +13,10 @@ def create_app():
     migrate.init_app(app, db)
 
     db.init_app(app)
-    from app.routes.ui import ui_bp
-    
     from app.routes.events import events_bp
     from app.routes.health import health_bp
     from app.routes.readiness import readiness_bp
+    from app.routes.ui import ui_bp
 
     app.register_blueprint(events_bp)
     app.register_blueprint(health_bp)

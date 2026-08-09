@@ -1,9 +1,5 @@
 from flask import Blueprint, jsonify
 
-from app import db
-from app.services.event_service import get_redis
-
-
 health_bp = Blueprint("health", __name__)
 
 

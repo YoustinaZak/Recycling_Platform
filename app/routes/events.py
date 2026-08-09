@@ -2,10 +2,9 @@ from datetime import datetime
 
 from flask import Blueprint, jsonify, request
 
-from app.models import RecyclingEvent
 from app import db
+from app.models import RecyclingEvent
 from app.services.event_service import create_event
-
 
 events_bp = Blueprint("events", __name__)
 

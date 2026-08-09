@@ -1,3 +1,4 @@
+import json
 import os
 from datetime import datetime, timezone
 
@@ -6,8 +7,6 @@ from dotenv import load_dotenv
 
 from app import create_app, db
 from app.models import RecyclingEvent
-
-import json
 
 load_dotenv()
 
