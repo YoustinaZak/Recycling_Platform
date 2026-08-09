@@ -6,3 +6,4 @@ redis
 pytest
 python-dotenv
 gunicorn
+prometheus-client
