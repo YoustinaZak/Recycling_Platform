@@ -97,3 +97,26 @@ def event_to_dict(event):
             else None
         )
     }
+
+@events_bp.get("/events/<uuid:event_id>")
+def get_event(event_id):
+    event = db.session.get(RecyclingEvent, event_id)
+
+    if event is None:
+        return {"error": "Event not found"}, 404
+
+    return {
+        "id": str(event.id),
+        "machine_id": event.machine_id,
+        "material_type": event.material_type,
+        "item_count": event.item_count,
+        "event_timestamp": event.event_timestamp.isoformat(),
+        "processing_status": event.processing_status,
+        "estimated_weight_kg": event.estimated_weight_kg,
+        "created_at": event.created_at.isoformat(),
+        "processed_at": (
+            event.processed_at.isoformat()
+            if event.processed_at
+            else None
+        )
+    }, 200
