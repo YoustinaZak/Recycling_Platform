@@ -96,6 +96,7 @@
                     <th>Item Count</th>
                     <th>Status</th>
                     <th>Event Time</th>
+                    <th>Estimated Weight (kg)</th>
                 </tr>
             </thead>
 
@@ -116,6 +117,14 @@
 
                     <td>
                         {{ event.event_timestamp }}
+                    </td>
+
+                    <td>
+                        {% if event.estimated_weight_kg is not none %}
+                            {{ event.estimated_weight_kg }}
+                        {% else %}
+                            N/A
+                        {% endif %}
                     </td>
                 </tr>
 
