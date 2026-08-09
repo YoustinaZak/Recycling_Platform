@@ -1,0 +1,100 @@
+import os
+from datetime import datetime, timezone
+
+import redis
+from dotenv import load_dotenv
+
+from app import create_app, db
+from app.models import RecyclingEvent
+
+import json
+
+load_dotenv()
+
+
+redis_client = redis.from_url(
+    os.getenv("REDIS_URL"),
+    decode_responses=True
+)
+
+QUEUE_NAME = "recycling_events"
+
+
+# Estimated weight per item in kilograms
+MATERIAL_WEIGHTS = {
+    "PET": 0.02,
+    "CAN": 0.015,
+    "GLASS": 0.25,
+    "PAPER": 0.01,
+}
+
+
+def process_event(event_id):
+    app = create_app()
+
+    with app.app_context():
+        event = db.session.get(RecyclingEvent, event_id)
+
+        if event is None:
+            print(f"Event {event_id} not found")
+            return
+
+        if event.processing_status == "processed":
+            print(f"Event {event_id} is already processed")
+            return
+
+        weight_per_item = MATERIAL_WEIGHTS.get(
+            event.material_type.upper(),
+            0.02
+        )
+
+        event.estimated_weight_kg = (
+            event.item_count * weight_per_item
+        )
+
+        event.processing_status = "processed"
+        event.processed_at = datetime.now(timezone.utc)
+
+        db.session.commit()
+
+        print(
+            f"Processed event {event_id}: "
+            f"{event.estimated_weight_kg} kg"
+        )
+
+
+def run_worker():
+    print("Worker started...")
+    print(f"Listening on queue: {QUEUE_NAME}")
+
+    while True:
+        try:
+            result = redis_client.blpop(
+                QUEUE_NAME,
+                timeout=5
+            )
+
+            if result is None:
+                continue
+
+            queue_name, message = result
+
+            event_data = json.loads(message)
+            event_id = event_data["event_id"]
+
+            print(f"Received event: {event_id}")
+
+            try:
+                process_event(event_id)
+
+            except Exception as exc:
+                print(
+                    f"Failed to process event {event_id}: {exc}"
+                )
+
+        except redis.RedisError as exc:
+            print(f"Redis connection error: {exc}")
+
+
+if __name__ == "__main__":
+    run_worker()
