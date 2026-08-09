@@ -1,4 +1,6 @@
 from flask import Blueprint, jsonify
+from redis.exceptions import RedisError
+from sqlalchemy.exc import SQLAlchemyError
 
 from app import db
 from app.services.event_service import get_redis
@@ -12,13 +14,13 @@ def ready():
 
     try:
         db.session.execute(db.text("SELECT 1"))
-    except Exception:
+    except SQLAlchemyError:
         database_status = "unavailable"
 
     try:
         redis_client = get_redis()
         redis_client.ping()
-    except Exception:
+    except RedisError:
         redis_status = "unavailable"
 
     ready = (

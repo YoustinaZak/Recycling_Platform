@@ -76,7 +76,7 @@ def run_worker():
             if result is None:
                 continue
 
-            queue_name, message = result
+            _, message = result
 
             event_data = json.loads(message)
             event_id = event_data["event_id"]
@@ -86,7 +86,7 @@ def run_worker():
             try:
                 process_event(event_id)
 
-            except Exception as exc:
+            except Exception as exc: # noqa: BLE001
                 print(
                     f"Failed to process event {event_id}: {exc}"
                 )
