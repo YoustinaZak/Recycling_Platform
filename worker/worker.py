@@ -4,22 +4,27 @@ from datetime import datetime, timezone
 
 import redis
 from dotenv import load_dotenv
+from prometheus_client import start_http_server
 
 from app import create_app, db
 from app.models import RecyclingEvent
+from worker.metrics import (
+    events_failed,
+    events_processed,
+    queue_length,
+)
 
 load_dotenv()
 
-
 redis_client = redis.from_url(
     os.getenv("REDIS_URL"),
-    decode_responses=True
+    decode_responses=True,
+    socket_timeout=15,
+    socket_connect_timeout=5,
 )
 
 QUEUE_NAME = "recycling_events"
 
-
-# Estimated weight per item in kilograms
 MATERIAL_WEIGHTS = {
     "PET": 0.02,
     "CAN": 0.015,
@@ -36,15 +41,15 @@ def process_event(event_id):
 
         if event is None:
             print(f"Event {event_id} not found")
-            return
+            return False
 
         if event.processing_status == "processed":
             print(f"Event {event_id} is already processed")
-            return
+            return False
 
         weight_per_item = MATERIAL_WEIGHTS.get(
             event.material_type.upper(),
-            0.02
+            0.02,
         )
 
         event.estimated_weight_kg = (
@@ -61,8 +66,12 @@ def process_event(event_id):
             f"{event.estimated_weight_kg} kg"
         )
 
+        return True
+
 
 def run_worker():
+    start_http_server(8000)
+
     print("Worker started...")
     print(f"Listening on queue: {QUEUE_NAME}")
 
@@ -70,13 +79,20 @@ def run_worker():
         try:
             result = redis_client.blpop(
                 QUEUE_NAME,
-                timeout=5
+                timeout=5,
             )
 
             if result is None:
+                queue_length.set(
+                    redis_client.llen(QUEUE_NAME)
+                )
                 continue
 
             _, message = result
+
+            queue_length.set(
+                redis_client.llen(QUEUE_NAME)
+            )
 
             event_data = json.loads(message)
             event_id = event_data["event_id"]
@@ -84,11 +100,21 @@ def run_worker():
             print(f"Received event: {event_id}")
 
             try:
-                process_event(event_id)
+                processed = process_event(event_id)
 
-            except Exception as exc: # noqa: BLE001
+                if processed:
+                    events_processed.inc()
+
+                queue_length.set(
+                    redis_client.llen(QUEUE_NAME)
+                )
+
+            except Exception as exc:  # noqa: BLE001
+                events_failed.inc()
+
                 print(
-                    f"Failed to process event {event_id}: {exc}"
+                    f"Failed to process event "
+                    f"{event_id}: {exc}"
                 )
 
         except redis.RedisError as exc:

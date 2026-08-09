@@ -15,6 +15,7 @@ def create_app():
     db.init_app(app)
     from app.routes.events import events_bp
     from app.routes.health import health_bp
+    from app.routes.metrics import metrics_bp
     from app.routes.readiness import readiness_bp
     from app.routes.ui import ui_bp
 
@@ -22,5 +23,6 @@ def create_app():
     app.register_blueprint(health_bp)
     app.register_blueprint(readiness_bp)
     app.register_blueprint(ui_bp)
+    app.register_blueprint(metrics_bp)
 
     return app

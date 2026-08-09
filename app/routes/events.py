@@ -4,6 +4,7 @@ from flask import Blueprint, jsonify, request
 
 from app import db
 from app.models import RecyclingEvent
+from app.routes.metrics import events_created
 from app.services.event_service import create_event
 
 events_bp = Blueprint("events", __name__)
@@ -66,7 +67,8 @@ def create_event_route():
         item_count=data["item_count"],
         event_timestamp=event_timestamp
     )
-
+    
+    events_created.inc()
     return jsonify(event_to_dict(event)), 202
 
 @events_bp.route("/events", methods=["GET"])
