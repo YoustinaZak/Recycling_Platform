@@ -40,3 +40,16 @@ python run.py
 ### 8. Start the worker
 
 python -m worker.worker
+
+## Docker compose local setup
+
+### 1. Configure environment 
+
+Create a .env file:
+
+DATABASE_URL=...
+REDIS_URL=...
+
+### 2. Run the containers 
+
+docker compose up -d
