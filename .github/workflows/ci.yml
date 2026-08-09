@@ -54,6 +54,9 @@ jobs:
           ruff check .
 
       - name: Run tests
+        env:
+          DATABASE_URL: postgresql+psycopg2://dropme:dropme@localhost:5432/dropme_test
+          REDIS_URL: redis://localhost:6379/0
         run: |
           pytest
 
